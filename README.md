@@ -4,10 +4,11 @@ CS 3240 - Fall 2026
 
 ## Team Members
 
-- Name — Role
-- Name — Role
-- Name — Role
-- Name — Role
+- Will — Scrum Lead
+- Adam — Requirements Lead
+- Sid — QA
+- Michael — Development Lead
+- Aidan - DevOps
 
 ## Project Description
 
