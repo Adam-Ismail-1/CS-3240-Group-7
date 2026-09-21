@@ -1,0 +1,73 @@
+name: Django CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Django checks and tests (PostgreSQL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: meal_exchange_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d meal_exchange_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # These credentials only belong to this temporary CI database.
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/meal_exchange_ci
+      DATABASE_SSL_REQUIRE: "False"
+      DJANGO_DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+      DJANGO_SECRET_KEY: ci-only-key-for-disposable-test-environments-never-use-in-production
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: .python-version
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Check Django and require PostgreSQL
+        run: |
+          python manage.py check
+          python manage.py shell -c "from django.db import connection; assert connection.vendor == 'postgresql', 'CI must use PostgreSQL'"
+
+      - name: Check and apply migrations
+        run: |
+          python manage.py makemigrations --check --dry-run
+          python manage.py migrate --noinput
+
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput
+
+      - name: Run tests
+        run: python manage.py test
+
+      - name: Check the deployed homepage configuration
+        run: >-
+          python manage.py shell -c "from django.test import Client;
+          response = Client().get('/', secure=True);
+          assert response.status_code == 200, response.status_code"

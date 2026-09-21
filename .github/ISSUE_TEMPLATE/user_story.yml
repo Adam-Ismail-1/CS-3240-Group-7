@@ -1,0 +1,49 @@
+name: User story
+description: Record a requirement and its source in the project backlog.
+title: "User story: "
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      description: Describe the user's goal and why it matters.
+      placeholder: As a [user role], I want [capability], so that [benefit].
+    validations:
+      required: true
+  - type: dropdown
+    id: source_type
+    attributes:
+      label: Requirement source
+      options:
+        - Course constraint
+        - Survey
+        - Interview
+        - Artifact analysis
+        - Team proposal awaiting validation
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+      description: Reference a course requirement or an actual elicitation finding. Use respondent IDs instead of names or email addresses.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable outcomes needed to complete this story.
+      placeholder: "- [ ] A user can ..."
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
