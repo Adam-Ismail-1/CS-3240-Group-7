@@ -9,9 +9,14 @@ env/
 
 # Django/local database
 db.sqlite3
+db.sqlite3-*
+staticfiles/
+media/
 
 # Environment variables
 .env
+.env.*
+!.env.example
 
 # IDE
 .vscode/
